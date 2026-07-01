@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34316.72
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.Api", "DocGenPlatform\DocGenPlatform.Api.csproj", "{93F416F9-F6F7-4328-BA62-C76A5369A181}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.Core", "DocGenPlatform.Core\DocGenPlatform.Core.csproj", "{C5FFAFC5-CFA0-4AD0-BAF5-4278864288AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.Vector.Chroma", "DocGenPlatform.Vector.Chroma\DocGenPlatform.Vector.Chroma.csproj", "{22E7F1C0-3CD1-49B1-BB54-315EC4404CA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.Vector.Weaviate", "DocGenPlatform.Vector.Weaviate\DocGenPlatform.Vector.Weaviate.csproj", "{99A79F7C-2D5E-4579-A28E-481DF44028D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.SkKernel", "DocGenPlatform.SkKernel\DocGenPlatform.SkKernel.csproj", "{CF8B3982-812E-4B34-B3C1-AAEEB3022A65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocGenPlatform.Convert", "DocGenPlatform.Convert\DocGenPlatform.Convert.csproj", "{72CCC8FE-9B3A-4458-BA18-DC095138DFA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93F416F9-F6F7-4328-BA62-C76A5369A181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93F416F9-F6F7-4328-BA62-C76A5369A181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93F416F9-F6F7-4328-BA62-C76A5369A181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93F416F9-F6F7-4328-BA62-C76A5369A181}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5FFAFC5-CFA0-4AD0-BAF5-4278864288AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5FFAFC5-CFA0-4AD0-BAF5-4278864288AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5FFAFC5-CFA0-4AD0-BAF5-4278864288AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5FFAFC5-CFA0-4AD0-BAF5-4278864288AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22E7F1C0-3CD1-49B1-BB54-315EC4404CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22E7F1C0-3CD1-49B1-BB54-315EC4404CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22E7F1C0-3CD1-49B1-BB54-315EC4404CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22E7F1C0-3CD1-49B1-BB54-315EC4404CA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99A79F7C-2D5E-4579-A28E-481DF44028D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99A79F7C-2D5E-4579-A28E-481DF44028D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99A79F7C-2D5E-4579-A28E-481DF44028D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99A79F7C-2D5E-4579-A28E-481DF44028D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF8B3982-812E-4B34-B3C1-AAEEB3022A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF8B3982-812E-4B34-B3C1-AAEEB3022A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF8B3982-812E-4B34-B3C1-AAEEB3022A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF8B3982-812E-4B34-B3C1-AAEEB3022A65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72CCC8FE-9B3A-4458-BA18-DC095138DFA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72CCC8FE-9B3A-4458-BA18-DC095138DFA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72CCC8FE-9B3A-4458-BA18-DC095138DFA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72CCC8FE-9B3A-4458-BA18-DC095138DFA9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {311BEFBC-457C-4288-B08A-D91DD0C2FBA1}
+	EndGlobalSection
+EndGlobal

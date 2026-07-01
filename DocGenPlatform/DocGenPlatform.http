@@ -1,0 +1,6 @@
+@DocGenPlatform.Api_HostAddress = http://localhost:5239
+
+GET {{DocGenPlatform.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
