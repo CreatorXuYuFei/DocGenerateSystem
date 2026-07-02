@@ -6,16 +6,10 @@ using System.ComponentModel;
 namespace DocGenPlatform.SkKernel.Plugins;
 
 /// <summary>模板检索插件</summary>
-public class TemplateRetrievePlugin
+public class TemplateRetrievePlugin(IVectorStore vectorStore, string embeddingModel)
 {
-    private readonly IVectorStore _vectorStore;
-    private readonly string _embeddingModel;
-
-    public TemplateRetrievePlugin(IVectorStore vectorStore, string embeddingModel)
-    {
-        _vectorStore = vectorStore;
-        _embeddingModel = embeddingModel;
-    }
+    private readonly IVectorStore _vectorStore = vectorStore;
+    private readonly string _embeddingModel = embeddingModel;
 
     [KernelFunction("search_template")]
     [Description("根据用户需求语义匹配最优文档模板")]

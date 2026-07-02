@@ -6,16 +6,10 @@ using System.ComponentModel;
 namespace DocGenPlatform.SkKernel.Plugins;
 
 /// <summary>RAG 知识库检索插件</summary>
-public class RagKnowledgePlugin
+public class RagKnowledgePlugin(IVectorStore vectorStore, string embeddingModel)
 {
-    private readonly IVectorStore _vectorStore;
-    private readonly string _embeddingModel;
-
-    public RagKnowledgePlugin(IVectorStore vectorStore, string embeddingModel)
-    {
-        _vectorStore = vectorStore;
-        _embeddingModel = embeddingModel;
-    }
+    private readonly IVectorStore _vectorStore = vectorStore;
+    private readonly string _embeddingModel = embeddingModel;
 
     [KernelFunction("search_knowledge")]
     [Description("根据模板分类检索相关知识库素材")]

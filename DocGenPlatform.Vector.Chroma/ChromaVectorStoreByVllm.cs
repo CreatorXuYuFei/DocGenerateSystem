@@ -16,7 +16,7 @@ public class ChromaVectorStoreByVllm : IVectorStore
     private readonly ChromaCollectionClient _knowledgeCollectionClient;
     private readonly HttpClient _httpClient;
     private readonly string _embeddingEndpoint;
-    private readonly string _defaultEmbeddingModel;
+    private readonly string _defaultEmbeddingModel = "";//默认向量模型
 
     // 集合名称固定
     private const string TemplateCollectionName = "doc_templates";

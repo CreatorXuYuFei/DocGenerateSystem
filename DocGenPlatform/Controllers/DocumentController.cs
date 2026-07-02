@@ -6,14 +6,9 @@ namespace DocGenPlatform.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DocumentController : ControllerBase
+public class DocumentController(DocGenerateSkService generateService) : ControllerBase
 {
-    private readonly DocGenerateSkService _generateService;
-
-    public DocumentController(DocGenerateSkService generateService)
-    {
-        _generateService = generateService;
-    }
+    private readonly DocGenerateSkService _generateService = generateService;
 
     /// <summary>生成结构化文档并下载</summary>
     [HttpPost("generate")]

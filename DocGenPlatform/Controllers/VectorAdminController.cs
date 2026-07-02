@@ -6,14 +6,9 @@ namespace DocGenPlatform.Api.Controllers;
 
 [ApiController]
 [Route("api/vector-admin")]
-public class VectorAdminController : ControllerBase
+public class VectorAdminController(IVectorStoreFactory vectorFactory) : ControllerBase
 {
-    private readonly IVectorStoreFactory _vectorFactory;
-
-    public VectorAdminController(IVectorStoreFactory vectorFactory)
-    {
-        _vectorFactory = vectorFactory;
-    }
+    private readonly IVectorStoreFactory _vectorFactory = vectorFactory;
 
     /// <summary>入库文档模板</summary>
     [HttpPost("upsert-template")]
@@ -27,7 +22,7 @@ public class VectorAdminController : ControllerBase
         var embedding = await vectorStore.GetEmbeddingAsync(request.Template.TemplateDesc, "bge-m3");
         await vectorStore.UpsertTemplateAsync(request.Template, embedding);
 
-        return Ok(new { Id = request.Template.Id, Message = "模板入库成功" });
+        return Ok(new { request.Template.Id, Message = "模板入库成功" });
     }
 
     /// <summary>入库知识库分片</summary>
@@ -42,6 +37,6 @@ public class VectorAdminController : ControllerBase
         var embedding = await vectorStore.GetEmbeddingAsync(request.Knowledge.Content, "bge-m3");
         await vectorStore.UpsertKnowledgeAsync(request.Knowledge, embedding);
 
-        return Ok(new { Id = request.Knowledge.Id, Message = "知识库入库成功" });
+        return Ok(new { request.Knowledge.Id, Message = "知识库入库成功" });
     }
 }

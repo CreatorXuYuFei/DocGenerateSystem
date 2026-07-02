@@ -7,7 +7,7 @@ using ChromaDB.Client;
 namespace DocGenPlatform.Vector.Chroma;
 
 /// <summary>
-/// 严格对齐你提供的示例代码 | ChromaDB.Client 1.0.0-pre10
+/// 严格对齐提供的示例代码 | ChromaDB.Client 1.0.0-pre10
 /// 兼容 IVectorStore 接口，无缝接入原有项目
 /// </summary>
 public class ChromaVectorStore : IVectorStore
@@ -22,11 +22,11 @@ public class ChromaVectorStore : IVectorStore
     private const string KnowledgeCollectionName = "doc_knowledge";
 
     /// <summary>
-    /// 构造函数：完全复刻你的示例写法
+    /// 构造函数：完全复刻的示例写法
     /// </summary>
     public ChromaVectorStore(string chromaHost, string ollamaHost, HttpClient? httpClient = null)
     {
-        // 1. 严格按照你的示例配置 Chroma
+        // 1. 严格按照的示例配置 Chroma
         var baseUrl = $"{chromaHost.TrimEnd('/')}/api/v1/";
         var cfg = new ChromaConfigurationOptions(baseUrl);
         httpClient ??= new HttpClient();
@@ -35,7 +35,7 @@ public class ChromaVectorStore : IVectorStore
         // 2. 初始化 Ollama 向量生成客户端
         _ollamaClient = new OllamaApiClient(new Uri(ollamaHost));
 
-        // 3. 创建/获取两个集合（模板库 + 知识库），复刻你的写法
+        // 3. 创建/获取两个集合（模板库 + 知识库），复刻的写法
         var templateColl = _chromaClient.GetOrCreateCollection(TemplateCollectionName).Result;
         _templateCollectionClient = new ChromaCollectionClient(templateColl, cfg, httpClient);
 
@@ -44,11 +44,11 @@ public class ChromaVectorStore : IVectorStore
     }
 
     /// <summary>
-    /// 初始化（空实现，构造函数已完成初始化，对齐你的代码）
+    /// 初始化（空实现，构造函数已完成初始化，对齐的代码）
     /// </summary>
     public Task InitializeAsync()
     {
-        // 你的示例中无初始化方法，构造函数已完成所有操作
+        // 的示例中无初始化方法，构造函数已完成所有操作
         return Task.CompletedTask;
     }
 
@@ -64,7 +64,7 @@ public class ChromaVectorStore : IVectorStore
     }
 
     /// <summary>
-    /// 插入模板向量：对齐你的 Add 方法
+    /// 插入模板向量：对齐的 Add 方法
     /// </summary>
     public async Task UpsertTemplateAsync(TemplateItem template, float[] embedding)
     {
@@ -75,10 +75,10 @@ public class ChromaVectorStore : IVectorStore
             ["templateMarkdown"] = template.TemplateMarkdown
         };
 
-        // float[] 转 ReadOnlyMemory<float>（你的示例核心写法）
+        // float[] 转 ReadOnlyMemory<float>（的示例核心写法）
         var memVec = new ReadOnlyMemory<float>(embedding);
 
-        // 用 Add 方法，完全匹配你的代码
+        // 用 Add 方法，完全匹配的代码
         await _templateCollectionClient.Add(
             ids: [template.Id],
             embeddings: [memVec],
@@ -87,13 +87,13 @@ public class ChromaVectorStore : IVectorStore
     }
 
     /// <summary>
-    /// 检索模板：严格对齐你的 Query 写法
+    /// 检索模板：严格对齐的 Query 写法
     /// </summary>
     public async Task<List<TemplateItem>> SearchTemplateAsync(float[] queryEmbedding, int topK)
     {
         var memQuery = new ReadOnlyMemory<float>(queryEmbedding);
 
-        // 你的示例写法：无多余参数，直接 Query
+        // 的示例写法：无多余参数，直接 Query
         var resultList = await _templateCollectionClient.Query(
             queryEmbeddings: memQuery,
             nResults: topK,

@@ -16,7 +16,7 @@ public class VectorStoreFactory(IConfiguration configuration) : IVectorStoreFact
     public IVectorStore Create(VectorEngineType engineType)
     {
         var ollamaHost = _configuration["Ollama:Host"]
-            ?? throw new ArgumentNullException("Ollama:Host 配置缺失");
+            ?? throw new Exception("Ollama:Host 配置缺失");
 
         return engineType switch
         {
@@ -30,21 +30,21 @@ public class VectorStoreFactory(IConfiguration configuration) : IVectorStoreFact
     private ChromaVectorStore CreateChromaStore(string ollamaHost)
     {
         var chromaHost = _configuration["Vector:Chroma:Host"]
-            ?? throw new ArgumentNullException("Chroma 地址配置缺失");
+            ?? throw new Exception("Chroma 地址配置缺失");
         return new ChromaVectorStore(chromaHost, ollamaHost);
     }
 
     private WeaviateVectorStore CreateWeaviateStore(string ollamaHost)
     {
         var weaviateHost = _configuration["Vector:Weaviate:Host"]
-            ?? throw new ArgumentNullException("Weaviate 地址配置缺失");
+            ?? throw new Exception("Weaviate 地址配置缺失");
         return new WeaviateVectorStore(weaviateHost, ollamaHost);
     }
 
     private ChromaVectorStoreByVllm CreateChromaStoreByVllm(string ollamaHost)
     {
         var chromaHost = _configuration["Vector:Chroma:Host"]
-            ?? throw new ArgumentNullException("Chroma 地址配置缺失");
+            ?? throw new Exception("Chroma 地址配置缺失");
         return new ChromaVectorStoreByVllm(chromaHost, ollamaHost);
     }
 }

@@ -15,10 +15,10 @@ namespace DocGenPlatform.Api
             string ollamaHost = "http://localhost:11434";
             string llmModel = "qwen3:35b";
             string embeddingModel = "nomic-embed-text";
-            string vectorEngine = "chroma"; // 与你的向量库实现对应
+            string vectorEngine = "chroma"; // 与的向量库实现对应
 
             // ========== 2. 初始化向量库 ==========
-            var vectorFactory = new VectorStoreFactory(null); // 你的向量库工厂
+            var vectorFactory = new VectorStoreFactory(null); // 的向量库工厂
             var vectorStore = vectorFactory.Create(Core.Enums.VectorEngineType.Chroma);
             vectorStore.InitializeAsync();
 
@@ -58,7 +58,7 @@ namespace DocGenPlatform.Api
             var history = new ChatHistory();
 
             // 系统提示词 + 知识库上下文 + 用户问题
-            history.AddSystemMessage($"你是专业文档助手，请基于以下参考资料回答用户问题，禁止编造内容。\n\n参考资料：\n{knowledgeContext}");
+            history.AddSystemMessage($"是专业文档助手，请基于以下参考资料回答用户问题，禁止编造内容。\n\n参考资料：\n{knowledgeContext}");
             history.AddUserMessage(userQuery);
 
             var response = chatService.GetChatMessageContentAsync(history);

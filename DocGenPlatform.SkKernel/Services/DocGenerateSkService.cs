@@ -4,7 +4,6 @@ using DocGenPlatform.SkKernel.Plugins;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using System.Net.Http.Json;
-using System.Text;
 
 namespace DocGenPlatform.SkKernel.Services;
 
@@ -61,31 +60,22 @@ public class DocGenerateSkService(
         // 5. 构建强约束 Prompt
         var systemPrompt = BuildGeneratePrompt(request.UserPrompt, template.TemplateMarkdown, knowledgeText);
 
-        // 6. 单独创建干净的生成内核，不注册任何插件
-        //var generateKernel = KernelBuilder.CreateOllamaKernel(_ollamaHost, request.LlmModel);
+        //6.调用大模型
+        string rawMarkdown = string.Empty;
+        if (request.VectorEngine != Core.Enums.VectorEngineType.ChromaByVllm)
+        {
+            var rawResponse = await kernel.InvokePromptAsync(systemPrompt, new KernelArguments
+            {
+                ["temperature"] = 0.3,
+                ["max_tokens"] = 8192
+            });
 
-        //var rawResponse = await generateKernel.InvokePromptAsync(systemPrompt, new KernelArguments
-        //{
-        //    ["temperature"] = 0.3,
-        //    ["max_tokens"] = 8192
-        //});
+            rawMarkdown = rawResponse.ToString().Trim();
+        }
+        else
+            // ✅ 原生调用vLLM 生成文档，彻底避开 SK 兼容问题
+            rawMarkdown = await CallVllmGenerateAsync(systemPrompt, request.LlmModel);
 
-        //var chatMessage = rawResponse.GetValue<ChatMessageContent>();
-
-        //// ✅ 手动聚合所有文本内容，解决 Text 属性为空的问题
-        //StringBuilder contentBuilder = new();
-        //foreach (var item in chatMessage.Items)
-        //{
-        //    if (item is Microsoft.SemanticKernel.TextContent textItem)
-        //    {
-        //        contentBuilder.Append(textItem.Text);
-        //    }
-        //}
-
-        //string rawMarkdown = contentBuilder.ToString().Trim();
-
-        // 6. ✅ 原生调用 vLLM 生成文档，彻底避开 SK 兼容问题
-        string rawMarkdown = await CallVllmGenerateAsync(systemPrompt, request.LlmModel);
 
         // 7. 格式化清洗 ✅ 修正：同样用 GetValue 提取，避免 ToString() 不稳定
         var formatFunc = kernel.Plugins["FormatPlugin"]["fix_markdown"];
@@ -105,7 +95,7 @@ public class DocGenerateSkService(
     {
         return $"""
         ## 角色定位
-        你是专业的企业文档生成专家，严格遵循模板结构输出高质量文档，禁止输出任何与文档内容无关的解释、思考、寒暄。
+        是专业的企业文档生成专家，严格遵循模板结构输出高质量文档，禁止输出任何与文档内容无关的解释、思考、寒暄。
 
         ## 核心规则
         1. 必须完整保留【标准模板】的所有标题层级、表格结构、列表顺序，不得增删一级/二级标题
@@ -139,7 +129,7 @@ public class DocGenerateSkService(
             new { role = "user", content = prompt }
         },
             temperature = 0.3,
-            // 建议调大，避免文档被截断（你的测试里 finish_reason = length 就是被截断了）
+            // 建议调大，避免文档被截断（的测试里 finish_reason = length 就是被截断了）
             max_tokens = 8192
         };
 
