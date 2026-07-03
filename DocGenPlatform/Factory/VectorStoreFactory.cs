@@ -1,5 +1,6 @@
 ﻿using DocGenPlatform.Core.Abstractions;
 using DocGenPlatform.Core.Enums;
+using DocGenPlatform.Tools;
 using DocGenPlatform.Vector.Chroma;
 using DocGenPlatform.Vector.Weaviate;
 
@@ -9,13 +10,11 @@ namespace DocGenPlatform.Api.Infrastructure;
 /// 向量库工厂实现
 /// 唯一允许引用 Chroma/Weaviate 具体实现的地方，放在组合根 Api 层
 /// </summary>
-public class VectorStoreFactory(IConfiguration configuration) : IVectorStoreFactory
+public class VectorStoreFactory() : IVectorStoreFactory
 {
-    private readonly IConfiguration _configuration = configuration;
-
     public IVectorStore Create(VectorEngineType engineType)
     {
-        var ollamaHost = _configuration["Ollama:Host"]
+        var ollamaHost = ConfigHelper.GetAppSettingValue("LLMSettings:BaseAddress")
             ?? throw new Exception("Ollama:Host 配置缺失");
 
         return engineType switch
@@ -27,23 +26,23 @@ public class VectorStoreFactory(IConfiguration configuration) : IVectorStoreFact
         };
     }
 
-    private ChromaVectorStore CreateChromaStore(string ollamaHost)
+    private static ChromaVectorStore CreateChromaStore(string ollamaHost)
     {
-        var chromaHost = _configuration["Vector:Chroma:Host"]
+        var chromaHost = ConfigHelper.GetAppSettingValue("Vector:Chroma:Host")
             ?? throw new Exception("Chroma 地址配置缺失");
         return new ChromaVectorStore(chromaHost, ollamaHost);
     }
 
-    private WeaviateVectorStore CreateWeaviateStore(string ollamaHost)
+    private static WeaviateVectorStore CreateWeaviateStore(string ollamaHost)
     {
-        var weaviateHost = _configuration["Vector:Weaviate:Host"]
+        var weaviateHost = ConfigHelper.GetAppSettingValue("Vector:Weaviate:Host")
             ?? throw new Exception("Weaviate 地址配置缺失");
         return new WeaviateVectorStore(weaviateHost, ollamaHost);
     }
 
-    private ChromaVectorStoreByVllm CreateChromaStoreByVllm(string ollamaHost)
+    private static ChromaVectorStoreByVllm CreateChromaStoreByVllm(string ollamaHost)
     {
-        var chromaHost = _configuration["Vector:Chroma:Host"]
+        var chromaHost = ConfigHelper.GetAppSettingValue("Vector:Chroma:Host")
             ?? throw new Exception("Chroma 地址配置缺失");
         return new ChromaVectorStoreByVllm(chromaHost, ollamaHost);
     }

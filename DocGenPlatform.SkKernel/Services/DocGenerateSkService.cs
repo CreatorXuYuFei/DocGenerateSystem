@@ -1,6 +1,7 @@
 ﻿using DocGenPlatform.Core.Abstractions;
 using DocGenPlatform.Core.Models;
 using DocGenPlatform.SkKernel.Plugins;
+using DocGenPlatform.Tools;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using System.Net.Http.Json;
@@ -15,7 +16,7 @@ public class DocGenerateSkService(
 {
     private readonly IVectorStoreFactory _vectorFactory = vectorFactory;
     private readonly IDocConvertService _convertService = convertService;
-    private readonly string _ollamaHost = configuration["Ollama:Host"]!;
+    private readonly string _ollamaHost = ConfigHelper.GetAppSettingValue("LLMSettings:BaseAddress")!;
 
     /// <summary>执行完整文档生成流程</summary>
     public async Task<byte[]> GenerateDocumentAsync(DocGenerateRequest request)

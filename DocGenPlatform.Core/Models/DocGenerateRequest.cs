@@ -1,4 +1,5 @@
 ﻿using DocGenPlatform.Core.Enums;
+using DocGenPlatform.Tools;
 using System.ComponentModel.DataAnnotations;
 
 namespace DocGenPlatform.Core.Models;
@@ -22,8 +23,8 @@ public class DocGenerateRequest
     public int KnowledgeTopK { get; set; } = 3;
 
     /// <summary>Ollama 生成模型名称</summary>
-    public string LlmModel { get; set; } = "Qwen/Qwen3.6-35B-A3B";
+    public string LlmModel { get; set; } = ConfigHelper.GetAppSettingValue("LLMSettings:ModelId")?? "Qwen/Qwen3.6-35B-A3B";
 
     /// <summary>Ollama 嵌入模型名称</summary>
-    public string EmbeddingModel { get; set; } = "bge-m3";
+    public string EmbeddingModel { get; set; } = ConfigHelper.GetAppSettingValue("LLMSettings:EmbeddingModel") ?? "bge-m3";
 }

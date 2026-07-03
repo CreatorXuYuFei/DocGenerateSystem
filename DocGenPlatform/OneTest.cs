@@ -18,7 +18,7 @@ namespace DocGenPlatform.Api
             string vectorEngine = "chroma"; // 与的向量库实现对应
 
             // ========== 2. 初始化向量库 ==========
-            var vectorFactory = new VectorStoreFactory(null); // 的向量库工厂
+            var vectorFactory = new VectorStoreFactory(); // 的向量库工厂
             var vectorStore = vectorFactory.Create(Core.Enums.VectorEngineType.Chroma);
             vectorStore.InitializeAsync();
 

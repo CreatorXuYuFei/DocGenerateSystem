@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DocGenPlatform.Core\DocGenPlatform.Core.csproj" />
+    <ProjectReference Include="..\DocGenPlatform.Tools\DocGenPlatform.Tools.csproj" />
   </ItemGroup>
 
 </Project>

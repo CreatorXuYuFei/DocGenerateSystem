@@ -4,6 +4,7 @@ using DocGenPlatform.Core.Abstractions;
 using DocGenPlatform.Core.Models;
 using OllamaSharp;
 using Microsoft.Extensions.AI;
+using DocGenPlatform.Tools;
 
 namespace DocGenPlatform.Vector.Weaviate;
 
@@ -22,8 +23,8 @@ public class WeaviateVectorStore : IVectorStore
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
     };
 
-    private const string TemplateClass = "DocTemplate";
-    private const string KnowledgeClass = "DocKnowledge";
+    private static readonly string TemplateCollectionName = ConfigHelper.GetAppSettingValue("Vector:TemplateCollectionName")!;
+    private static readonly string KnowledgeCollectionName = ConfigHelper.GetAppSettingValue("Vector:KnowledgeCollectionName")!;
     private static readonly string[] stringArray = ["text"];
     private static readonly string[] stringArray0 = ["text"];
     private static readonly string[] stringArray1 = ["string"];
@@ -47,7 +48,7 @@ public class WeaviateVectorStore : IVectorStore
             throw new Exception($"Weaviate 服务连接失败，状态码：{(int)readyResp.StatusCode}");
 
         // 2. 自动创建两个集合（不存在则创建）
-        await EnsureCollectionAsync(TemplateClass, new[]
+        await EnsureCollectionAsync(TemplateCollectionName, new[]
         {
             new { Name = "templateName", DataType = stringArray },
             new { Name = "templateDesc", DataType = stringArray0 },
@@ -55,7 +56,7 @@ public class WeaviateVectorStore : IVectorStore
             new { Name = "category", DataType = stringArray1 }
         });
 
-        await EnsureCollectionAsync(KnowledgeClass, new[]
+        await EnsureCollectionAsync(KnowledgeCollectionName, new[]
         {
             new { Name = "content", DataType = stringArray5 },
             new { Name = "source", DataType = stringArray4 },
@@ -101,7 +102,7 @@ public class WeaviateVectorStore : IVectorStore
     {
         var obj = new
         {
-            @class = TemplateClass,
+            @class = TemplateCollectionName,
             id = template.Id,
             vector = embedding,
             properties = new
@@ -128,7 +129,7 @@ public class WeaviateVectorStore : IVectorStore
             query = $$"""
             {
               Get {
-                {{TemplateClass}}(nearVector: {vector: {{JsonSerializer.Serialize(queryEmbedding)}}, limit: {{topK}}}) {
+                {{TemplateCollectionName}}(nearVector: {vector: {{JsonSerializer.Serialize(queryEmbedding)}}, limit: {{topK}}}) {
                   templateName
                   templateDesc
                   templateMarkdown
@@ -144,7 +145,7 @@ public class WeaviateVectorStore : IVectorStore
         resp.EnsureSuccessStatusCode();
 
         var result = await resp.Content.ReadFromJsonAsync<GraphqlResponse<TemplateGraphqlItem>>(_jsonOptions);
-        var items = result?.Data?.Get.GetProperty(TemplateClass).EnumerateArray() ?? [];
+        var items = result?.Data?.Get.GetProperty(TemplateCollectionName).EnumerateArray() ?? [];
 
         var list = new List<TemplateItem>();
         foreach (var item in items)
@@ -167,7 +168,7 @@ public class WeaviateVectorStore : IVectorStore
     {
         var obj = new
         {
-            @class = KnowledgeClass,
+            @class = KnowledgeCollectionName,
             id = chunk.Id,
             vector = embedding,
             properties = new
@@ -195,7 +196,7 @@ public class WeaviateVectorStore : IVectorStore
             query = $$"""
             {
               Get {
-                {{KnowledgeClass}}(
+                {{KnowledgeCollectionName}}(
                   nearVector: {vector: {{JsonSerializer.Serialize(queryEmbedding)}}, limit: {{topK}}},
                   where: {{whereFilter}}
                 ) {
@@ -213,7 +214,7 @@ public class WeaviateVectorStore : IVectorStore
         resp.EnsureSuccessStatusCode();
 
         var result = await resp.Content.ReadFromJsonAsync<GraphqlResponse<KnowledgeGraphqlItem>>(_jsonOptions);
-        var items = result?.Data?.Get.GetProperty(KnowledgeClass).EnumerateArray() ?? [];
+        var items = result?.Data?.Get.GetProperty(KnowledgeCollectionName).EnumerateArray() ?? [];
 
         var list = new List<KnowledgeChunk>();
         foreach (var item in items)

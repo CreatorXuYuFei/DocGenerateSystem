@@ -17,6 +17,6 @@ namespace DocGenPlatform.Core.Models
         /// <summary>关联模板分类</summary>
         public string TemplateCategory { get; set; } = string.Empty;
         /// <summary>扩展元数据</summary>
-        public Dictionary<string, object> Metadata { get; set; } = new();
+        public Dictionary<string, object> Metadata { get; set; } = [];
     }
 }

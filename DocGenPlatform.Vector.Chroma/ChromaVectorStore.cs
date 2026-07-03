@@ -3,6 +3,7 @@ using DocGenPlatform.Core.Models;
 using OllamaSharp;
 using Microsoft.Extensions.AI;
 using ChromaDB.Client;
+using DocGenPlatform.Tools;
 
 namespace DocGenPlatform.Vector.Chroma;
 
@@ -18,8 +19,8 @@ public class ChromaVectorStore : IVectorStore
     private readonly OllamaApiClient _ollamaClient;
 
     // 集合名称固定
-    private const string TemplateCollectionName = "doc_templates";
-    private const string KnowledgeCollectionName = "doc_knowledge";
+    private static readonly string TemplateCollectionName = ConfigHelper.GetAppSettingValue("Vector:TemplateCollectionName")!;
+    private static readonly string KnowledgeCollectionName = ConfigHelper.GetAppSettingValue("Vector:KnowledgeCollectionName")!;
 
     /// <summary>
     /// 构造函数：完全复刻的示例写法

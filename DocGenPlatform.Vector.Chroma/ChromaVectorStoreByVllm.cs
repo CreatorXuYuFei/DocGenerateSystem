@@ -2,6 +2,7 @@
 using DocGenPlatform.Core.Models;
 using System.Text.Json;
 using ChromaDB.Client;
+using DocGenPlatform.Tools;
 
 namespace DocGenPlatform.Vector.Chroma;
 
@@ -19,8 +20,8 @@ public class ChromaVectorStoreByVllm : IVectorStore
     private readonly string _defaultEmbeddingModel = "";//默认向量模型
 
     // 集合名称固定
-    private const string TemplateCollectionName = "doc_templates";
-    private const string KnowledgeCollectionName = "doc_knowledge";
+    private static readonly string TemplateCollectionName = ConfigHelper.GetAppSettingValue("Vector:TemplateCollectionName")!;
+    private static readonly string KnowledgeCollectionName = ConfigHelper.GetAppSettingValue("Vector:KnowledgeCollectionName")!;
 
     // 复用 JSON 序列化配置
     private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
@@ -30,7 +31,6 @@ public class ChromaVectorStoreByVllm : IVectorStore
     /// </summary>
     /// <param name="chromaHost">Chroma 服务地址</param>
     /// <param name="embeddingHost">vLLM 嵌入服务根地址（如 http://localhost:8001）</param>
-    /// <param name="embeddingModel">默认嵌入模型名</param>
     /// <param name="httpClient">可复用的 HttpClient 实例</param>
     public ChromaVectorStoreByVllm(string chromaHost, string embeddingHost, HttpClient? httpClient = null)
     {

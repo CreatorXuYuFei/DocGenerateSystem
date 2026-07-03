@@ -1,7 +1,10 @@
 ﻿using DocGenPlatform.Core.Abstractions;
 using DocGenPlatform.Core.Enums;
+using DocGenPlatform.Tools;
+using NewLife.Serialization;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Text;
 
 namespace DocGenPlatform.Convert;
@@ -29,16 +32,58 @@ public class PandocDocConvertService : IDocConvertService
 
         try
         {
-            var process = new ProcessStartInfo
+            var startInfo = new ProcessStartInfo
             {
-                FileName = "C:\\Users\\mayn\\AppData\\Local\\Microsoft\\WinGet\\Packages\\JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe\\pandoc-3.10\\pandoc.exe",
-                Arguments = $"-s \"{tempMd}\" -o \"{tempOut}\" -f markdown -t {format}",
+                FileName = ConfigHelper.GetAppSettingValue("Doc:DocToolAddress"),
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                RedirectStandardError = true
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                StandardErrorEncoding = Encoding.UTF8,
+                StandardOutputEncoding = Encoding.UTF8
             };
 
-            using var proc = Process.Start(process);
+            // 所有参数全部通过ArgumentList添加，和Arguments属性互斥
+            startInfo.ArgumentList.Add("-s");
+            startInfo.ArgumentList.Add(tempMd);
+            startInfo.ArgumentList.Add("-o");
+            startInfo.ArgumentList.Add(tempOut);
+            startInfo.ArgumentList.Add("-f");
+            startInfo.ArgumentList.Add("markdown");
+            startInfo.ArgumentList.Add("-t");
+            startInfo.ArgumentList.Add(format);
+
+            //调整文档字体排版
+            if (format.Equals("docx", StringComparison.OrdinalIgnoreCase))
+            {
+                // 加载自定义字体模板
+                string templateFile = Path.Combine(AppContext.BaseDirectory, "Template", "font_template.docx");//await BuildTempFontTemplate(ConfigHelper.GetAppSettingValue("Doc:DocToolAddress")??"");
+                if (File.Exists(templateFile))
+                {
+                    startInfo.ArgumentList.Add("--reference-doc");
+                    startInfo.ArgumentList.Add(templateFile);
+                }
+            }
+            else if (format.Equals("pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                startInfo.ArgumentList.Add("--pdf-engine");
+                startInfo.ArgumentList.Add("xelatex");
+
+                // PDF中文字体配置
+                startInfo.ArgumentList.Add("-V");
+                startInfo.ArgumentList.Add("mainfont=Microsoft YaHei");
+                startInfo.ArgumentList.Add("-V");
+                startInfo.ArgumentList.Add("CJKmainfont=SimSun");
+                startInfo.ArgumentList.Add("-V");
+                startInfo.ArgumentList.Add("sansfont=SimHei");
+                startInfo.ArgumentList.Add("-V");
+                startInfo.ArgumentList.Add("monofont=Consolas");
+                startInfo.ArgumentList.Add("-V");
+                startInfo.ArgumentList.Add("fontsize=12pt");
+            }
+
+
+            using var proc = Process.Start(startInfo);
             await proc!.WaitForExitAsync();
 
             if (proc.ExitCode != 0)
@@ -64,6 +109,74 @@ public class PandocDocConvertService : IDocConvertService
             // 清理临时文件
             if (File.Exists(tempMd)) File.Delete(tempMd);
             if (File.Exists(tempOut)) File.Delete(tempOut);
+        }
+    }
+
+    /// <summary>
+    /// 动态生成自定义字体的reference-docx模板
+    /// </summary>
+    private async Task<string> BuildTempFontTemplate(string pandocExe)
+    {
+        string tempDocx = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.docx");
+        string unzipDir = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}");
+
+        try
+        {
+            // 1. 从pandoc标准输出读取默认模板二进制流，写入本地docx文件
+            var psi = new ProcessStartInfo(pandocExe)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
+            };
+            psi.ArgumentList.Add("--print-default-data-file");
+            psi.ArgumentList.Add("reference.docx");
+
+            using var proc = Process.Start(psi)!;
+            // 二进制流直接复制到文件，禁止用ReadToEnd读字符串
+            using var fileStream = File.Create(tempDocx);
+            await proc.StandardOutput.BaseStream.CopyToAsync(fileStream);
+            await proc.WaitForExitAsync();
+            fileStream.Close();
+
+            if (proc.ExitCode != 0 || !File.Exists(tempDocx))
+                throw new Exception("导出pandoc默认模板失败");
+
+            // 2. 解压docx（本质是zip包）
+            Directory.CreateDirectory(unzipDir);
+            ZipFile.ExtractToDirectory(tempDocx, unzipDir, overwriteFiles: true);
+
+            // 3. 修改主题字体配置
+            string themeXmlPath = Path.Combine(unzipDir, "word", "theme", "theme1.xml");
+            if (!File.Exists(themeXmlPath))
+                throw new Exception("模板主题文件不存在，pandoc版本可能不兼容");
+
+            string xmlContent = await File.ReadAllTextAsync(themeXmlPath);
+            // 替换默认西文字体 Calibri → 微软雅黑
+            xmlContent = xmlContent.Replace("w:val=\"Calibri\"", "w:val=\"Microsoft YaHei\"");
+            // 替换默认标题字体 Cambria → 黑体
+            xmlContent = xmlContent.Replace("w:val=\"Cambria\"", "w:val=\"SimHei\"");
+            await File.WriteAllTextAsync(themeXmlPath, xmlContent);
+
+            // 4. 重新打包回docx
+            File.Delete(tempDocx);
+            ZipFile.CreateFromDirectory(unzipDir, tempDocx, CompressionLevel.Optimal, false);
+
+            //清理窗口进程占用
+            proc.Dispose();
+
+            return tempDocx;
+        }
+        catch
+        {
+            // 失败清理资源
+            File.Delete(tempDocx);
+            throw;
+        }
+        finally
+        {
+            // 清理解压临时目录
+            try { if (Directory.Exists(unzipDir)) Directory.Delete(unzipDir, true); } catch { }
         }
     }
 }
