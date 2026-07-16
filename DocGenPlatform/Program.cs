@@ -4,6 +4,7 @@ using DocGenPlatform.Convert;
 using DocGenPlatform.SkKernel.Services;
 using CoreLogger;
 using CoreLogger.Enum;
+using DocGenPlatform.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 #region 初始化日志配置
@@ -41,6 +42,11 @@ SysLogHelper.Configure(opt =>
     opt.Filter.BlockKeywords.Add("测试密码");  // 屏蔽包含该关键词的日志
 });
 #endregion
+
+//设置端口
+string httpUrl = ConfigHelper.GetAppSettingValue("appSettings:IpAndPort");
+Console.WriteLine($"程序监听端口：{httpUrl}");
+builder.WebHost.UseUrls(httpUrl);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -53,11 +59,14 @@ builder.Services.AddLogging(b => b.AddConsole().SetMinimumLevel(LogLevel.Debug))
 var app = builder.Build();
 
 // 中间件...
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

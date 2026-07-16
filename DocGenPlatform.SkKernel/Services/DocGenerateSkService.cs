@@ -19,7 +19,7 @@ public class DocGenerateSkService(
     private readonly string _ollamaHost = ConfigHelper.GetAppSettingValue("LLMSettings:BaseAddress")!;
 
     /// <summary>执行完整文档生成流程</summary>
-    public async Task<byte[]> GenerateDocumentAsync(DocGenerateRequest request)
+    public async Task<(byte[],string)> GenerateDocumentAsync(DocGenerateRequest request)
     {
         // 1. 创建向量库实例
         var vectorStore = _vectorFactory.Create(request.VectorEngine);

@@ -1,6 +1,7 @@
 ﻿using DocGenPlatform.Core.Models;
 using DocGenPlatform.SkKernel.Services;
 using Microsoft.AspNetCore.Mvc;
+using NewLife;
 
 namespace DocGenPlatform.Api.Controllers;
 
@@ -10,9 +11,9 @@ public class DocumentController(DocGenerateSkService generateService) : Controll
 {
     private readonly DocGenerateSkService _generateService = generateService;
 
-    /// <summary>生成结构化文档并下载</summary>
+    /// <summary>生成结构化文档并返回文件信息</summary>
     [HttpPost("generate")]
-    public async Task<IActionResult> GenerateDocument([FromBody] DocGenerateRequest request)
+    public async Task<GenerateDocumentResult> GenerateDocument([FromBody] DocGenerateRequest request)
     {
         var fileBytes = await _generateService.GenerateDocumentAsync(request);
 
@@ -32,6 +33,13 @@ public class DocumentController(DocGenerateSkService generateService) : Controll
             _ => "text/markdown"
         };
 
-        return File(fileBytes, contentType, $"generated_document{fileExt}");
+        return new GenerateDocumentResult
+        {
+            FileName = $"generated_document{fileExt}",
+            ContentType = contentType,
+            FileUrl = fileBytes.Item2,                           // 文件地址
+            FileBase64 = fileBytes.Item1.ToBase64(),   // 文件流转 base64
+            FileSize = fileBytes.Item1.Length                     // 文件大小（字节）
+        };
     }
 }

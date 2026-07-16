@@ -12,10 +12,10 @@ namespace DocGenPlatform.Convert;
 /// <summary>基于 Pandoc 的文档格式转换服务</summary>
 public class PandocDocConvertService : IDocConvertService
 {
-    public async Task<byte[]> ConvertAsync(string markdownContent, DocExportType exportType)
+    public async Task<(byte[], string)> ConvertAsync(string markdownContent, DocExportType exportType)
     {
         if (exportType == DocExportType.Markdown)
-            return Encoding.UTF8.GetBytes(markdownContent);
+            return (Encoding.UTF8.GetBytes(markdownContent), "");
 
         var format = exportType switch
         {
@@ -66,21 +66,24 @@ public class PandocDocConvertService : IDocConvertService
             }
             else if (format.Equals("pdf", StringComparison.OrdinalIgnoreCase))
             {
+                // 替换引擎为wkhtmltopdf，不再依赖xelatex/MiKTeX
                 startInfo.ArgumentList.Add("--pdf-engine");
-                startInfo.ArgumentList.Add("xelatex");
+                startInfo.ArgumentList.Add("wkhtmltopdf");
 
-                // PDF中文字体配置
+                // PDF页面边距配置，替代原xelatex字体参数
                 startInfo.ArgumentList.Add("-V");
-                startInfo.ArgumentList.Add("mainfont=Microsoft YaHei");
+                startInfo.ArgumentList.Add("margin-top=2cm");
                 startInfo.ArgumentList.Add("-V");
-                startInfo.ArgumentList.Add("CJKmainfont=SimSun");
+                startInfo.ArgumentList.Add("margin-bottom=2cm");
                 startInfo.ArgumentList.Add("-V");
-                startInfo.ArgumentList.Add("sansfont=SimHei");
+                startInfo.ArgumentList.Add("margin-left=2cm");
                 startInfo.ArgumentList.Add("-V");
-                startInfo.ArgumentList.Add("monofont=Consolas");
+                startInfo.ArgumentList.Add("margin-right=2cm");
+                // 基础字体大小适配
                 startInfo.ArgumentList.Add("-V");
-                startInfo.ArgumentList.Add("fontsize=12pt");
+                startInfo.ArgumentList.Add("font-size=12pt");
             }
+
 
 
             using var proc = Process.Start(startInfo);
@@ -92,7 +95,10 @@ public class PandocDocConvertService : IDocConvertService
                 throw new Exception($"Pandoc 转换失败: {error}");
             }
 
-            return await File.ReadAllBytesAsync(tempOut);
+            //上传文件
+            string fileDic = FunctionTool.SendImgByCompany(tempOut);
+
+            return (await File.ReadAllBytesAsync(tempOut), fileDic);
         }
         catch (Exception ex)
         {

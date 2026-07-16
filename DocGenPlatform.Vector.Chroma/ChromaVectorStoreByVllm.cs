@@ -82,7 +82,7 @@ public class ChromaVectorStoreByVllm : IVectorStore
         return result.Data[0].Embedding;
     }
 
-    #region 模板读写逻辑（完全不变）
+    #region 模板读写逻辑
     public async Task UpsertTemplateAsync(TemplateItem template, float[] embedding)
     {
         var metadata = new Dictionary<string, object>(template.Metadata)
@@ -128,7 +128,7 @@ public class ChromaVectorStoreByVllm : IVectorStore
     }
     #endregion
 
-    #region 知识库读写逻辑（完全不变）
+    #region 知识库读写逻辑
     public async Task UpsertKnowledgeAsync(KnowledgeChunk chunk, float[] embedding)
     {
         var metadata = new Dictionary<string, object>(chunk.Metadata)
@@ -137,7 +137,7 @@ public class ChromaVectorStoreByVllm : IVectorStore
             ["templateCategory"] = chunk.TemplateCategory
         };
 
-        var memVec = new ReadOnlyMemory<float>(embedding);
+        var memVec = new ReadOnlyMemory<float>(embedding); 
         await _knowledgeCollectionClient.Add(
             ids: [chunk.Id],
             embeddings: [memVec],

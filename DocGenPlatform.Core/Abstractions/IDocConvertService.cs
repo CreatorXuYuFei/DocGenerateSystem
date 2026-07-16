@@ -6,5 +6,5 @@ namespace DocGenPlatform.Core.Abstractions;
 public interface IDocConvertService
 {
     /// <summary>Markdown 转换为目标格式二进制流</summary>
-    Task<byte[]> ConvertAsync(string markdownContent, DocExportType exportType);
+    Task<(byte[], string)> ConvertAsync(string markdownContent, DocExportType exportType);
 }

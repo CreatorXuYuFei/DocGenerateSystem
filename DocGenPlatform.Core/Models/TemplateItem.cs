@@ -16,6 +16,8 @@ namespace DocGenPlatform.Core.Models
         public string TemplateDesc { get; set; } = string.Empty;
         /// <summary>模板完整 Markdown 结构</summary>
         public string TemplateMarkdown { get; set; } = string.Empty;
+        ///<summary>模板下载地址</summary>
+        public string TemplateAddress {  get; set; } = string.Empty;
         /// <summary>模板分类（合同/方案/周报/报告等）</summary>
         public string Category { get; set; } = string.Empty;
         /// <summary>扩展元数据</summary>
